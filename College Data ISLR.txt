@@ -1,0 +1,63 @@
+Auth: Vinit Rajguru
+# Date: Oct 21, 2017
+# Desc: College Dataset from ISLR
+
+
+
+
+install.packages(ISLR)
+
+#load data
+College=read.csv("college.csv")
+
+
+#fix data
+fix(College)
+
+
+# to change the name of the row and for eliminate the first coloumn
+row.names(College)=College[,1]
+College=College[,-1]
+fix(College)
+
+#Summary of the data
+summary(College)
+
+#To produce scatterplot matrix we use pairs functions 
+# you can change matrix if you want like [,1:5]something like this
+pairs(College[,1:10])
+
+#use plot function to produce side by side box plots of Outstate vs Private.
+#(you can use different variables as per your requirement)
+plot(College$Private,College$Outstate)
+
+
+# we are going to divide universities into two groups 
+#base on whether or not the proportion of students coming from the
+#top10% of their high school classes exceeds 50%
+Elite =rep("No",nrow(College))
+Elite[College$Top10perc>50]="Yes"
+Elite=as.factor(Elite)
+College=data.frame(College,Elite)
+summary(College$Elite)
+plot(College$Elite,College$Outstate)
+
+
+#use hist() fucntion to produce some histogram
+par(mfrow=c(2,2))
+hist(College$PhD,col=2)
+hist(College$Apps)
+hist(College$perc.alumni,col=3)
+hist(College$Expend,breaks = 10,col=3)
+hist(College$S.F.Ratio,col=1,breaks = 7)
+
+# we continuous exploring  the data
+par(mfrow=c(1,1))
+plot(College$Outstate,College$Grad.Rate)
+
+#high tuition correlates to high graduation rate
+plot(College$Accept/College$Apps,College$S.F.Ratio)
+
+#colleges with low accdeptance rate tend to have low S.F.Ratio
+plot(College$Top10perc,College$Grad.Rate)
+

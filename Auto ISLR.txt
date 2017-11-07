@@ -1,0 +1,46 @@
+Auth: Vinit Rajguru
+# Date: Oct 21, 2017
+# Desc: Auto Dataset from ISLR
+
+
+
+
+#load the data
+Auto=read.csv("Auto.csv",header = TRUE,na.strings = "?")
+View(Auto)
+
+#missing values and fix them
+> Auto=na.omit(Auto)
+> dim(Auto)
+
+#summary
+summary(Auto)
+
+#Apply the range funciton to know about the range
+sapply(Auto[,1:7],range)
+sapply(Auto[,1:7],mean)
+sapply(Auto[,1:7],sd)
+
+
+#Remove the 10th throguh 85th observations
+newauto=Auto[-(10:85),]
+dim(newauto)
+newauto[9,]==Auto[9,]
+newauto[10,]==Auto[86,]
+
+# find range,mean,sd
+sapply(newauto[,1:7],range)
+sapply(newauto[,1:7],mean)
+sapply(newauto[,1:7],sd)
+
+
+#pairs
+pairs(Auto)
+plot(Auto$mpg,Auto$cylinders)
+#more cylinders, less mpg
+plot(Auto$mpg,Auto$weight)
+#heavier weight, correates with lower mpg
+plot(Auto$mpg,Auto$year)
+#with the passage of time car becomes more efficient
+
+

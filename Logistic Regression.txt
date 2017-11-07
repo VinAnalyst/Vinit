@@ -1,0 +1,127 @@
+Auth: Vinit Rajguru
+# Date: Oct 21, 2017
+# Desc: Weekly Dataset from ISLR for Logistic Regresison, LDA, QDA, KNN
+
+
+
+#load Weekly data from ISLR library
+library(ISLR)
+summary(Weekly)
+pairs(Weekly)
+
+
+# cor
+cor(Weekly[,-9])
+# As we can see Volume and year have some kind relation here
+
+#Now we perfrom logistic regression with Direction as a response 
+# and the other variables as a predictors including volume
+
+attach(Weekly)
+glm.fit=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,
+            data = Weekly,family = binomial)
+summary(glm.fit)
+
+
+# the snallest P value here is associated with Lag2, which shows that
+# there have some statistical significance here with the Direction
+
+
+
+# Now we compute confusion matrix and 
+#overall fracion of correct predictions
+# the type response options tells R to output probabilities
+glm.probs=predict(glm.fit,type = "response")
+
+#the first command create a vector of the total elements
+# the second line transfroms to up all elements for 
+#which the predicted probability of a market increase exceeds 0.5
+glm.pred=rep("down",length(glm.probs))
+glm.pred[glm.probs>0.5]="up"
+
+
+#the table function can be used to produce confusion matrix in
+# order to determine how many were correctly or incorrectly classified
+table(glm.pred,Direction)
+(557+54)/1089
+# 56.1%
+
+# it means that market would go up on 557 days and that
+#it would go down on 54 days
+#In this case the logistic regression correctly predicted
+#the movement of the market 56.1% of the time
+
+# Fit the logistic regression model using a training data period 
+# from 1990 to 2008, with Lag2 as a predictor
+train=(Year<2009)
+Weekly.2009=Weekly[!train,]
+dim(Weekly.2009)
+glm.fit=glm(Direction~Lag2,data = Weekly,family = binomial,subset = train)
+glm.probs=predict(glm.fit,Weekly.2009,type = "response")
+glm.pred=rep("down",length(glm.probs))
+glm.pred[glm.probs>0.5]="up"
+Direction.2009=Direction[!train]
+table(glm.pred,Direction.2009)
+(56+9)/104
+#62.5 %
+
+
+## Now we are using LDA methos for the same data set ##
+library(MASS)
+lda.fit=lda(Direction~Lag2,data = Weekly,subset = train)
+lda.pred=predict(lda.fit,Weekly.2009)
+table(lda.pred$class,Direction.2009)
+mean(lda.pred$class==Direction.2009)
+
+## QDA method
+qda.fit=qda(Direction~Lag2,data = Weekly,subset = train)
+qda.pred=predict(qda.fit,Weekly.2009)
+table(qda.pred$class,Direction.2009)
+mean(qda.pred$class==Direction.2009)
+
+
+# Now we are using KNN, K=1
+library(class)
+train.X=as.matrix(Lag2[train])
+test.X=as.matrix(Lag2[!train])
+train.Direction=Direction[train]
+set.seed(1)
+knn.pred=knn(train.X,test.X,train.Direction,k=1)
+table(knn.pred,Direction.2009)
+mean(knn.pred==Direction.2009)
+
+
+# Logistic regression with Lag2:Lag3
+glm.fit=glm(Direction~Lag2:Lag3,data = Weekly,family = binomial,subset = train)
+glm.probs=predict(glm.fit,Weekly.2009,type = "response")
+glm.pred=rep("down",length(glm.probs))
+glm.pred[glm.probs>0.5]="up"
+Direction.2009=Direction[!train]
+mean(glm.pred==Direction.2009)
+
+glm.fit = glm(Direction ~ Lag2:Lag1, data = Weekly, family = binomial, subset = train)
+glm.probs = predict(glm.fit, Weekly.2009, type = "response")
+glm.pred = rep("Down", length(glm.probs))
+glm.pred[glm.probs > 0.5] = "Up"
+Direction.2009 = Direction[!train]
+table(glm.pred, Direction.2009)
+mean(glm.pred==Direction.2009)
+
+
+#LDA with lag 2 interaction with lag1
+lda.fit = lda(Direction ~ Lag2:Lag1, data = Weekly, subset = train)
+lda.pred = predict(lda.fit, Weekly.2009)
+mean(lda.pred$class == Direction.2009)
+
+
+#QDA with sqrt(abs(lag3))
+qda.fit = qda(Direction ~ Lag3 + sqrt(abs(Lag3)), data = Weekly, subset = train)
+qda.class = predict(qda.fit, Weekly.2009)$class
+table(qda.class, Direction.2009)
+mean(qda.class==Direction.2009)
+
+
+# KNN, K=5
+knn.pred = knn(train.X, test.X, train.Direction, k = 5)
+table(knn.pred, Direction.2009)
+mean(knn.pred==Direction.2009)
